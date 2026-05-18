@@ -1,6 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('Auth') // Biar rapi ngelompok di Swagger
 @Controller('auth')
@@ -23,4 +24,18 @@ export class AuthController {
     // Panggil fungsi login di service dengan data dari body request
     return this.authService.login(body.username, body.password);
   }
+  // ==========================================
+  // RUTE BARU BUAT NGETES SATPAM
+  // ==========================================
+  // @Get('profile')
+  // @UseGuards(JwtAuthGuard) // <-- Pak Satpam jaga pintu di sini!
+  // @ApiBearerAuth() // <-- Kasih tahu Swagger kalau butuh token
+  // @ApiOperation({ summary: 'Tes akses area VVIP (Wajib bawa token)' })
+  // getProfile(@Req() req) {
+  //   // Kalau lolos satpam, req.user bakal berisi data dari jwt.strategy
+  //   return {
+  //     message: 'Berhasil nembus penjagaan satpam bro!',
+  //     data_lu: req.user, 
+  //   };
+  // }
 }
