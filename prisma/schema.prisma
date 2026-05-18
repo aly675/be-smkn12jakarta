@@ -1,13 +1,189 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Berita {
+  id        String    @id @default(uuid()) @db.Uuid
+  title     String
+  content   String
+  excerpt   String?
+  image     String?
+  author    String?
+  date      DateTime? @default(now()) @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("berita")
+}
+
+model Pengumuman {
+  id        String    @id @default(uuid()) @db.Uuid
+  title     String
+  content   String
+  date      DateTime? @default(now()) @db.Timestamptz()
+  important Boolean?  @default(false)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("pengumuman")
+}
+
+model Guru {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  nip       String?
+  position  String?
+  subject   String?
+  photo     String?
+  education String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("guru")
+}
+
+model Pegawai {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  nip       String?
+  position  String?
+  division  String?
+  photo     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("pegawai")
+}
+
+model Ekskul {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  image       String?
+  schedule    String?
+  coach       String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("ekskul")
+}
+
+model Prestasi {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  description  String?
+  date         DateTime? @default(now()) @db.Timestamptz()
+  level        String?
+  category     String?
+  image        String?
+  participants String?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("prestasi")
+}
+
+model Layanan {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  url         String?
+  icon        String?
+  category    String?  @default("siswa")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("layanan")
+}
+
+model Jurusan {
+  id                  String   @id @default(uuid()) @db.Uuid
+  name                String
+  slug                String   @unique
+  description         String?
+  image               String?
+  icon                String?
+  suitableFor         String[] @map("suitable_for")
+  careerOpportunities String[] @map("career_opportunities")
+  subjects            String[]
+  practiceImages      String[] @map("practice_images")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("jurusan")
+}
+
+model KepalaSekolah {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  nip       String?
+  photo     String?
+  motto     String?
+  greeting  String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("kepala_sekolah")
+}
+
+model MitraIndustri {
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  logo            String?
+  cooperationType String?  @map("cooperation_type")
+  website         String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("mitra_industri")
+}
+
+model SocialMedia {
+  id        String   @id @default(uuid()) @db.Uuid
+  platform  String
+  url       String
+  icon      String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("social_media")
+}
+
+model SiteSettings {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  value     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("site_settings")
+}
+
+enum Role {
+  ADMIN
+  GURU
+  SISWA
+  ORANGTUA
+  PEGAWAI
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  username  String   @unique // Buat login praktis (admin, NISN, NIP)
+  email     String?  @unique // Buat Google SSO & Reset Password (opsional dulu)
+  password  String   
+  role      Role     @default(SISWA)
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("users")
 }
