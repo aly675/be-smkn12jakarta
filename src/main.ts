@@ -1,16 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common'; // <-- 1. Import ini
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true, 
+    whitelist: true, 
+  }));
 
   // Setup konfigurasi Swagger
   const config = new DocumentBuilder()
     .setTitle('Portal API SMKN 12')
     .setDescription('Dokumentasi API untuk Portal Web')
     .setVersion('1.0')
-    .addBearerAuth() // Buat persiapan tiket JWT
+    .addBearerAuth() 
     .build();
     
   const document = SwaggerModule.createDocument(app, config);
