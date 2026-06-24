@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Param, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { MinioService } from '../minio/minio.service';
-import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('News')
@@ -80,5 +80,15 @@ export class NewsController {
     const limitNumber = limit ? +limit : 10;
 
     return this.newsService.findAll(pageNumber, limitNumber, search, category);
+  }
+
+  // ==========================================
+  // JALUR 4: BACA BERITA BERDASARKAN ID (Public)
+  // ==========================================
+  @Get(':id')
+  @ApiOperation({ summary: 'Ambil detail berita berdasarkan ID (Public)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Berita (UUID)' })
+  findOne(@Param('id') id: string) {
+    return this.newsService.findOne(id);
   }
 }

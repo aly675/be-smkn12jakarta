@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -7,7 +7,7 @@ export class NewsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createNewsDto: CreateNewsDto, authorId: string) {
-    const newsBaru = await this.prisma.berita.create({
+    const currentNews = await this.prisma.berita.create({
       data: {
         title: createNewsDto.title,
         content: createNewsDto.content,
@@ -21,7 +21,7 @@ export class NewsService {
 
     return {
       message: 'Berita berhasil diterbitkan bro!',
-      data: newsBaru,
+      data: currentNews,
     };
   }
 
@@ -53,7 +53,12 @@ export class NewsService {
         include: {
           // Relasi: Ambil data penulis, TAPI JANGAN BAWA PASSWORD-NYA!
           author: {
-            select: { id: true, email: true, avatar: true }, // Sesuaikan dengan nama kolom nama/email di tabel User lu
+            select: { 
+              id: true, 
+              email: true, 
+              name: true,
+              avatar: true 
+            }, 
           },
         },
       }),
@@ -70,6 +75,33 @@ export class NewsService {
         dataPerPage: limit,
         totalPages: Math.ceil(total / limit),
       },
+    };
+  }
+
+  async findOne(id: string) {
+    const news = await this.prisma.berita.findUnique({
+      where: { id: id },
+      include: {
+        // Tarik data penulisnya juga biar FE senang
+        author: {
+          select: { 
+            id: true, 
+            email: true, 
+            name: true,
+            avatar: true
+          },
+        },
+      },
+    });
+
+    // Validasi kalau beritanya nggak ada di database
+    if (!news) {
+      throw new NotFoundException(`Waduh bro, berita dengan ID ${id} nggak ketemu!`);
+    }
+
+    return {
+      message: 'Berhasil mengambil detail berita',
+      data: news,
     };
   }
 }
