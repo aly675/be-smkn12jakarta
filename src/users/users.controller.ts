@@ -14,30 +14,45 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // ==========================================
+  // JALUR 1: CREATE USER BARU (Data JSON)
+  // ==========================================
  @Post()
   @ApiOperation({ summary: 'Bikin user baru' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  // ==========================================
+  // JALUR 2: AMBIL DATA USER (JSON)
+  // ==========================================
   @Get()
   @ApiOperation({ summary: 'Ambil semua data user' })
   findAll() {
     return this.usersService.findAll();
   }
 
+  // ==========================================
+  // JALUR 3: AMBIL DATA USER BERDASARKAN ID (Data JSON)
+  // ==========================================
   @Get(':id')
   @ApiOperation({ summary: 'Ambil data user berdasarkan ID' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
+  // ==========================================
+  // JALUR 4: UPDATE DATA USER BERDASARKAN ID (Data JSON)
+  // ==========================================
   @Patch(':id')
   @ApiOperation({ summary: 'Update data user berdasarkan ID' })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
+  // ==========================================
+  // JALUR 5: HAPUS USER BERDASARKAN ID (Data JSON)
+  // ==========================================
   @Delete(':id')
   @ApiOperation({ summary: 'Hapus user berdasarkan ID' })
   remove(@Param('id') id: string, @Req() req: any) {
@@ -48,6 +63,9 @@ export class UsersController {
     return this.usersService.remove(id as any, currentUserId);
   }
 
+  // ==========================================
+  // JALUR 6: UPLOAD AVATAR USER (File Binary)
+  // ==========================================
   @Patch(':id/avatar')
   @ApiOperation({ summary: 'Upload atau ganti avatar user (Maks 500KB)' })
   @ApiConsumes('multipart/form-data') // Ngasih tau Swagger ini form upload

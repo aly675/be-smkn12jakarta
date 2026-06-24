@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Client } from 'minio';
 import * as crypto from 'crypto'; 
+import sharp from 'sharp';
 import 'multer'
 
 @Injectable()
@@ -20,38 +21,39 @@ export class MinioService {
   }
 
   // Fungsi sakti buat nerima dan nge-upload file
-  async uploadFile(file: Express.Multer.File, folderName: string ): Promise<string> {
+ async uploadFile(file: Express.Multer.File, folderName: string): Promise<string> {
     try {
-      // 1. Ambil ekstensi file aslinya (misal: .jpg, .png)
-      const extension = file.originalname.substring(file.originalname.lastIndexOf('.'));
+      // 2. PROSES KOMPRESI: Ubah gambar ke WebP & set kualitas ke 80%
+      // Kualitas 80% itu golden ratio: Gambar tetep tajam, tapi size turun drastis!
+      const compressedBuffer = await sharp(file.buffer)
+        .webp({ quality: 80 })
+        .toBuffer();
       
-      // 2. Rombak nama file jadi super unik: UUID + Timestamp
-      // Hasilnya bakal kayak gini: 9b1deb4d-3b7d-4bad-9bdd-1718956321.jpg
-      const uniqueFileName = `${folderName}/${crypto.randomUUID()}-${Date.now()}${extension}`;
+      // 3. Karena formatnya udah pasti diubah ke WebP, ekstensinya kita paksa .webp
+      const uniqueFileName = `${folderName}/${crypto.randomUUID()}-${Date.now()}.webp`;
       
-      // 3. Eksekusi upload ke dalam bucket MinIO
+      // 4. Kirim buffer yang udah dikompres ke MinIO
       await this.minioClient.putObject(
         this.bucketName,
         uniqueFileName,
-        file.buffer, // Ini isi mentahan fotonya
-        file.size,
-        { 'Content-Type': file.mimetype } // Ngasih tau MinIO ini tuh file gambar
+        compressedBuffer, 
+        compressedBuffer.length, 
+        { 'Content-Type': 'image/webp' } 
       );
 
-      // 4. Rangkai URL Public-nya biar bisa disimpen ke Postgres
+      // 5. Rangkai URL Public versi cantik (tanpa port 443)
       const protocol = process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http';
-
       const portString = (process.env.MINIO_PORT === '443' || process.env.MINIO_PORT === '80') 
         ? '' 
         : `:${process.env.MINIO_PORT}`;
-
+        
       const fileUrl = `${protocol}://${process.env.MINIO_ENDPOINT}${portString}/${this.bucketName}/${uniqueFileName}`;
       
       return fileUrl;
       
     } catch (error) {
       console.error('MinIO Upload Error:', error);
-      throw new InternalServerErrorException('Gagal upload gambar ke server MinIO bro!');
+      throw new InternalServerErrorException('Gagal memproses dan upload gambar bro!');
     }
   }
 }

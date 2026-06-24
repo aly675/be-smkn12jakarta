@@ -10,16 +10,22 @@ datasource db {
 
 model Berita {
   id        String    @id @default(uuid()) @db.Uuid
-  title     String
-  content   String
-  excerpt   String?
-  image     String?
-  author    String?
-  date      DateTime? @default(now()) @db.Timestamptz()
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  title     String    @db.Text
+  content   String    @db.Text
+  excerpt   String?   @db.Text
+  image     String?   @db.Text
+  
+  category  String?   @db.VarChar(100)
+  tags      String[]  
+  
+  authorId  String    @map("author_id") @db.Uuid
+  author    User      @relation(fields: [authorId], references: [id])
+  
+  date      DateTime? @default(now()) @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
-  @@map("berita")
+  @@map("berita") 
 }
 
 model Pengumuman {
@@ -169,6 +175,7 @@ model SiteSettings {
 enum Role {
   ADMIN
   GURU
+  Osis
   SISWA
   ORANGTUA
   PEGAWAI
@@ -185,5 +192,6 @@ model User {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
+  berita   Berita[]
   @@map("users")
 }
