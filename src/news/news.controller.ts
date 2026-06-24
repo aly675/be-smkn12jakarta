@@ -7,8 +7,6 @@ import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery } 
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('News')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard) 
 @Controller('news')
 export class NewsController {
   constructor(
@@ -20,6 +18,8 @@ export class NewsController {
   // JALUR 1: UPLOAD GAMBAR BERITA (File Binary)
   // ==========================================
   @Post('upload-image')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard) 
   @ApiOperation({ summary: 'Upload gambar untuk thumbnail/isi berita (Maks 2MB)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -52,6 +52,8 @@ export class NewsController {
   // JALUR 2: CREATE BERITA UTAMA (Data JSON)
   // ==========================================
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Terbitkan berita baru (JSON)' })
   create(@Body() createNewsDto: CreateNewsDto, @Req() req: any) {
     const authorId = req.user.id; 

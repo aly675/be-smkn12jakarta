@@ -101,7 +101,7 @@ export class UsersController {
           // Satpam Format: Cuma nerima jpeg, jpg, png
           new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
-        fileIsRequired: true, // Nggak boleh kosong
+        fileIsRequired: true, 
       }),
     ) file: Express.Multer.File,
   ) {
