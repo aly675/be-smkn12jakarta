@@ -90,8 +90,6 @@ async create(dto: CreateUserDto) {
           username: true,
           avatar: true,
           role: true,
-          createdAt: true,
-          updatedAt: true,
         }
       }),
       this.prisma.user.count({ where }),
@@ -112,7 +110,16 @@ async create(dto: CreateUserDto) {
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, name: true, username: true, email: true, role: true, avatar: true, createdAt: true },
+      select: { 
+        id: true, 
+        name: true, 
+        username: true, 
+        email: true, 
+        role: true, 
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+      } 
     });
 
     if (!user) {
