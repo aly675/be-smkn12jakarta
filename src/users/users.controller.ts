@@ -76,7 +76,7 @@ export class UsersController {
   // ==========================================
   // JALUR 6: UPLOAD AVATAR USER (File Binary)
   // ==========================================
-  @Patch(':id/avatar')
+  @Post(':id/avatar')
   @ApiOperation({ summary: 'Upload atau ganti avatar user (Maks 500KB)' })
   @ApiConsumes('multipart/form-data') // Ngasih tau Swagger ini form upload
   @ApiBody({
