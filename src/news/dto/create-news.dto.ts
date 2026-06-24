@@ -5,13 +5,13 @@ export class CreateNewsDto {
   @ApiProperty({ example: 'SMKN 12 Juara LKS!' })
   @IsNotEmpty( { message: 'Judul berita ga boleh kosong bro!' } )
   @IsString()
-  title!: string; // <-- Tambahin tanda seru (!) di sini bro
+  title!: string; 
 
   @ApiProperty({ example: 'Isi berita selengkapnya...' })
   @IsNotEmpty( { message: 'Isi berita ga boleh kosong bro!' } )
   @IsString()
-  content!: string; // <-- Di sini juga bro
-
+  content!: string; 
+  
   @ApiPropertyOptional({ example: 'Siswa SMKN 12 menang LKS tingkat kota.' })
   @IsOptional()
   @IsString()

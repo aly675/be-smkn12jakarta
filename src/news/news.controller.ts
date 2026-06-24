@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, UseGuards, Param, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards, Param, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
+import { UpdateNewsDto } from './dto/update-news.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { MinioService } from '../minio/minio.service';
-import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('News')
@@ -90,5 +91,22 @@ export class NewsController {
   @ApiParam({ name: 'id', type: 'string', description: 'ID Berita (UUID)' })
   findOne(@Param('id') id: string) {
     return this.newsService.findOne(id);
+  }
+
+  // ==========================================
+  // JALUR 5: UPDATE BERITA (Hanya Penulisnya)
+  // ==========================================
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update berita berdasarkan ID (Wajib Pemilik Berita)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Berita (UUID)' })
+  update(
+    @Param('id') id: string, 
+    @Body() updateNewsDto: UpdateNewsDto, 
+    @Req() req: any
+  ) {
+    const loggedInUserId = req.user.id; 
+    return this.newsService.update(id, updateNewsDto, loggedInUserId);
   }
 }

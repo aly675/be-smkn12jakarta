@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Injectable()
 export class NewsService {
@@ -102,6 +103,40 @@ export class NewsService {
     return {
       message: 'Berhasil mengambil detail berita',
       data: news,
+    };
+  }
+
+  async update(id: string, updateNewsDto: UpdateNewsDto, loggedInUserId: string) {
+    // 1. Cek apakah beritanya beneran ada di DB
+    const news = await this.prisma.berita.findUnique({
+      where: { id: id },
+    });
+
+    if (!news) {
+      throw new NotFoundException(`Berita dengan ID ${id} nggak ketemu bro!`);
+    }
+
+    // 2. VALIDASI KEAMANAN: Cek apakah yang mau ngedit adalah pemilik beritanya
+    if (news.authorId !== loggedInUserId) {
+      throw new ForbiddenException('Lu nggak berhak ngedit berita punya orang lain ya bro!');
+    }
+
+    // 3. Eksekusi update data
+    const newsUpdated = await this.prisma.berita.update({
+      where: { id: id },
+      data: {
+        title: updateNewsDto.title,
+        content: updateNewsDto.content,
+        excerpt: updateNewsDto.excerpt,
+        category: updateNewsDto.category,
+        tags: updateNewsDto.tags,
+        image: updateNewsDto.image,
+      },
+    });
+
+    return {
+      message: 'Berita berhasil diperbarui bro!',
+      data: newsUpdated,
     };
   }
 }

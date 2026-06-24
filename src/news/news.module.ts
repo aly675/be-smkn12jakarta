@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MinioModule } from '../minio/minio.module'; 
 
 @Module({
-  imports: [MinioModule], // <-- Masukin ke sini
+  imports: [MinioModule], 
   controllers: [NewsController],
   providers: [NewsService, PrismaService],
 })
