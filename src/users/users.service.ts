@@ -63,21 +63,50 @@ async create(dto: CreateUserDto) {
   }
 
     // Fungsi buat ngambil semua data user
-  async findAll() {
-    return await this.prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        role: true,
-        avatar: true,
-        createdAt: true,
+  async findAll(page: number = 1, limit: number = 10, search?: string) {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { username: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } }, 
+        { role: { contains: search, mode: 'insensitive' } }, 
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' }, // Mengurutkan dari user paling baru dibuat
+        select: {
+          // WAJIB: Jangan pernah kirim password ke Frontend!
+          id: true,
+          email: true,
+          name: true,
+          username: true,
+          avatar: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      message: 'Berhasil mengambil daftar user bro',
+      data,
+      meta: {
+        totalData: total,
+        currentPage: page,
+        dataPerPage: limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: {
-        createdAt: 'desc', 
-      }
-    });
+    };
   }
 
   async findOne(id: string) {

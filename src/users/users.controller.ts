@@ -1,9 +1,9 @@
-import { UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -27,9 +27,19 @@ export class UsersController {
   // JALUR 2: AMBIL DATA USER (JSON)
   // ==========================================
   @Get()
-  @ApiOperation({ summary: 'Ambil semua data user' })
-  findAll() {
-    return this.usersService.findAll();
+  @ApiOperation({ summary: 'Ambil semua daftar pengguna (Pagination & Search)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Cari berdasarkan email/username/nama/role' })
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    const pageNumber = page ? +page : 1;
+    const limitNumber = limit ? +limit : 10;
+    
+    return this.usersService.findAll(pageNumber, limitNumber, search);
   }
 
   // ==========================================
