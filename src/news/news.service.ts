@@ -139,4 +139,29 @@ export class NewsService {
       data: newsUpdated,
     };
   }
+
+  async remove(id: string, loggedInUserId: string, userRole: string) {
+    // 1. Cek dulu beritanya ada atau nggak
+    const news = await this.prisma.berita.findUnique({
+      where: { id: id },
+    });
+
+    if (!news) {
+      throw new NotFoundException(`Berita dengan ID ${id} udah nggak ada bro!`);
+    }
+
+    // 2. VALIDASI KEAMANAN: Cek kepemilikan
+    if (news.authorId !== loggedInUserId && userRole !== 'ADMIN' ) {
+      throw new ForbiddenException('Lu nggak berhak ngehapus berita orang lain ya bro!');
+    }
+
+    // 3. Eksekusi hapus data dari Postgres
+    await this.prisma.berita.delete({
+      where: { id: id },
+    });
+
+    return {
+      message: 'Berita berhasil dihapus selamanya bro!',
+    };
+  }
 }

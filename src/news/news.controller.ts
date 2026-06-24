@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, UseGuards, Param, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards, Param, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -108,5 +108,16 @@ export class NewsController {
   ) {
     const loggedInUserId = req.user.id; 
     return this.newsService.update(id, updateNewsDto, loggedInUserId);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Hapus berita berdasarkan ID (Wajib Pemilik Berita kecuali admin)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Berita (UUID)' })
+  remove(@Param('id') id: string, @Req() req: any) {
+    const loggedInUserId = req.user.id;
+    const userRole = req.user.role;
+    return this.newsService.remove(id, loggedInUserId, userRole);
   }
 }
