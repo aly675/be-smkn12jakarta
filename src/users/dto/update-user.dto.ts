@@ -26,13 +26,6 @@ export class UpdateUserDto {
   @MinLength(5, { message: 'Email minimal 5 karakter bro!' })
   email?: string;
 
-  @ApiPropertyOptional({ example: 'passwordBaru123' })
-  @Transform(({ value }) => value === '' ? undefined : value)
-  @IsOptional()
-  @IsString()
-  @MinLength(5, { message: 'Password baru minimal 5 karakter bro!' })
-  password?: string;
-
   @ApiPropertyOptional({ enum: Role, example: Role.GURU })
   @IsOptional()
   @Transform(({ value }) => value === '' ? undefined : value)

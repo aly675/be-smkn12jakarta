@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Users') 
 @ApiBearerAuth()
@@ -56,8 +57,17 @@ export class UsersController {
   // ==========================================
   @Patch(':id')
   @ApiOperation({ summary: 'Update data user berdasarkan ID' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: any 
+  ) {
+    // Ekstrak data dari token JWT
+    const loggedInUserId = req.user.id;
+    const userRole = req.user.role;
+
+    // Lempar ke service
+    return this.usersService.update(id, updateUserDto, loggedInUserId, userRole);
   }
 
   // ==========================================
@@ -68,9 +78,9 @@ export class UsersController {
   remove(@Param('id') id: string, @Req() req: any) {
     // req.user.id ini dapet dari hasil scan tiket JWT oleh jwt.strategy.ts
     const currentUserId = req.user.id; 
-    
+    const userRole = req.user.role; // Ekstrak role admin-nya dari token
     // Kita lempar id target dan id kita sendiri ke service
-    return this.usersService.remove(id as any, currentUserId);
+    return this.usersService.remove(id as any, currentUserId, userRole);
   }
 
   // ==========================================
@@ -104,9 +114,29 @@ export class UsersController {
         fileIsRequired: true, 
       }),
     ) file: Express.Multer.File,
+    @Req() req: any
   ) {
-    return this.usersService.uploadAvatar(id, file);
+    // Ekstrak data dari token JWT
+    const loggedInUserId = req.user.id;
+    const userRole = req.user.role;
+
+    return this.usersService.uploadAvatar(id, file, loggedInUserId, userRole);
   }
 
-  
+  //==========================================
+  // JALUR 7: RESET PASSWORD USER (Data JSON) 
+  // ==========================================
+  @Patch(':id/reset-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reset Password User (Khusus Admin)' })
+  resetPassword(
+    @Param('id') id: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Req() req: any
+  ) {
+    const loggedInUserId = req.user.id; 
+    const userRole = req.user.role;
+    return this.usersService.resetPassword(id, resetPasswordDto, loggedInUserId, userRole);
+  }
 }

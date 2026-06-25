@@ -1,9 +1,11 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException} from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException, ForbiddenException} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MinioService } from '../minio/minio.service';
 import * as bcrypt from 'bcrypt';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AuthHelper } from '../common/helper/auth.helper';
 
 @Injectable()
 export class UsersService {
@@ -128,9 +130,11 @@ async create(dto: CreateUserDto) {
     return user;
   }
 
-  async update(id: string, dto: UpdateUserDto) {
+  async update(id: string, dto: UpdateUserDto, loggedInUserId: string, userRole: string) {
     // 1. Pastikan usernya emang ada di database
-    await this.findOne(id);
+    const userToUpdate = await this.findOne(id);
+
+    AuthHelper.checkOwnershipOrAdmin(id, loggedInUserId, userRole, 'profil');
 
     Object.keys(dto).forEach((key) => {
       if (typeof dto[key] === 'string' && dto[key].trim() === '') {
@@ -166,12 +170,7 @@ async create(dto: CreateUserDto) {
       }
     }
 
-    // 3. Kalau ada password baru yang dikirim, kita hash dulu
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
-    }
-
-    // 4. Eksekusi update ke database
+    // 3. Eksekusi update ke database
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: dto,
@@ -191,11 +190,13 @@ async create(dto: CreateUserDto) {
     };
   }
 
-  async remove(id: string, currentUserId: string) {
+  async remove(id: string, currentUserId: string, userRole: string) {
     // 1. Validasi Anti-Bunuh Diri: Jangan biarin admin ngehapus dirinya sendiri
     if (id === currentUserId) {
       throw new BadRequestException('Lu nggak bisa menghapus akun lu sendiri pas lagi login bro! Bahaya!');
     }
+
+    AuthHelper.checkOwnershipOrAdmin(id, currentUserId, userRole, 'user');
 
     // 2. Cek dulu usernya beneran ada atau nggak di database
     await this.findOne(id);
@@ -210,9 +211,11 @@ async create(dto: CreateUserDto) {
     };
   }
 
-  async uploadAvatar(id: string, file: Express.Multer.File) {
+  async uploadAvatar(id: string, file: Express.Multer.File, loggedInUserId: string, userRole: string) {
     // 1. Pastikan usernya ada dulu sebelum capek-capek upload
     await this.findOne(id);
+
+    AuthHelper.checkOwnershipOrAdmin(id, loggedInUserId, userRole, 'avatar');
 
     // 2. Suruh MinioService nge-upload dan kita tangkep URL-nya
     const avatarUrl = await this.minioService.uploadFile(file, 'avatars');
@@ -226,6 +229,36 @@ async create(dto: CreateUserDto) {
     return {
       message: 'Avatar berhasil di-update bro!',
       avatarUrl: avatarUrl,
+    };
+  }
+
+  async resetPassword(id: string, resetPasswordDto: ResetPasswordDto, loggedInUserId: string, userRole: string) {
+    // 1. Validasi: Yang boleh make rute ini cuma ADMIN
+    AuthHelper.checkOwnershipOrAdmin(id, loggedInUserId, userRole, 'password'); 
+
+    // 2. Cek apakah user yang mau di-reset beneran ada
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User dengan ID ${id} nggak ketemu!`);
+    }
+
+    // 3. Enkripsi password barunya
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, saltRounds);
+
+    // 4. Simpan ke database
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return {
+      message: 'Password berhasil di-reset oleh Admin bro!',
     };
   }
 
