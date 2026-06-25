@@ -106,8 +106,9 @@ export class NewsController {
     @Body() updateNewsDto: UpdateNewsDto, 
     @Req() req: any
   ) {
-    const loggedInUserId = req.user.id; 
-    return this.newsService.update(id, updateNewsDto, loggedInUserId);
+    const loggedInUserId = req.user.id;
+    const userRole = req.user.role; 
+    return this.newsService.update(id, updateNewsDto, loggedInUserId, userRole);
   }
 
   @Delete(':id')

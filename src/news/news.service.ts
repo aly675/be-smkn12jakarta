@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { CreateNewsDto } from './dto/create-news.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { AuthHelper } from 'src/common/helper/auth.helper';
 
 @Injectable()
 export class NewsService {
@@ -106,7 +107,7 @@ export class NewsService {
     };
   }
 
-  async update(id: string, updateNewsDto: UpdateNewsDto, loggedInUserId: string) {
+  async update(id: string, updateNewsDto: UpdateNewsDto, loggedInUserId: string, userRole: string) {
     // 1. Cek apakah beritanya beneran ada di DB
     const news = await this.prisma.berita.findUnique({
       where: { id: id },
@@ -117,9 +118,7 @@ export class NewsService {
     }
 
     // 2. VALIDASI KEAMANAN: Cek apakah yang mau ngedit adalah pemilik beritanya
-    if (news.authorId !== loggedInUserId) {
-      throw new ForbiddenException('Lu nggak berhak ngedit berita punya orang lain ya bro!');
-    }
+    AuthHelper.checkOwnershipOrAdmin(news.authorId, loggedInUserId, userRole, 'berita');
 
     // 3. Eksekusi update data
     const newsUpdated = await this.prisma.berita.update({
@@ -150,10 +149,8 @@ export class NewsService {
       throw new NotFoundException(`Berita dengan ID ${id} udah nggak ada bro!`);
     }
 
-    // 2. VALIDASI KEAMANAN: Cek kepemilikan
-    if (news.authorId !== loggedInUserId && userRole !== 'ADMIN' ) {
-      throw new ForbiddenException('Lu nggak berhak ngehapus berita orang lain ya bro!');
-    }
+    // 2. Validasi Kepemilikan: Cek apakah yang mau hapus adalah pemilik beritanya atau Admin
+    AuthHelper.checkOwnershipOrAdmin(news.authorId, loggedInUserId, userRole, 'berita');
 
     // 3. Eksekusi hapus data dari Postgres
     await this.prisma.berita.delete({
