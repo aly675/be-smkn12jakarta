@@ -8,6 +8,7 @@ datasource db {
   provider = "postgresql"
 }
 
+
 model Berita {
   id        String    @id @default(uuid()) @db.Uuid
   title     String    @db.Text
@@ -28,14 +29,49 @@ model Berita {
   @@map("berita") 
 }
 
+
+enum PengumumanType {
+  teks
+  link
+  file
+}
+
+enum PengumumanTarget {
+  semua
+  siswa
+  orangtua
+  guru
+  pegawai
+  siswa_tertentu
+}
+
 model Pengumuman {
-  id        String    @id @default(uuid()) @db.Uuid
-  title     String
-  content   String
-  date      DateTime? @default(now()) @db.Timestamptz()
-  important Boolean?  @default(false)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  id            String           @id @default(uuid()) @db.Uuid
+  title         String
+  content       String           @db.Text
+  date          DateTime?        @default(now()) @db.Timestamptz()
+  important     Boolean?         @default(false)
+  
+  // Fitur baru menyesuaikan FE
+  type          PengumumanType   @default(teks)
+  linkUrl       String?          @map("link_url")
+  
+  // Postgres sakti: Bisa nyimpen array of object [{name: "abc", url: "xyz"}] lewat tipe Json
+  files         Json?            @default("[]") 
+  
+  target        PengumumanTarget @default(semua)
+  targetDetails String[]         @map("target_details") // Menyimpan array of string (misal daftar kelas atau ID siswa)
+
+  // Relasi Skenario B: Siapa yang bikin?
+  createdById   String           @map("created_by_id") @db.Uuid
+  createdBy     User             @relation(fields: [createdById], references: [id])
+
+  // Periode pengumuman aktif (penting buat mading digital)
+  startDate     DateTime?        @map("start_date") @db.Timestamptz()
+  endDate       DateTime?        @map("end_date") @db.Timestamptz()
+
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("pengumuman")
 }
@@ -193,5 +229,6 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   berita   Berita[]
+  pengumuman Pengumuman[]
   @@map("users")
 }
