@@ -21,7 +21,7 @@ export class MinioService {
   }
 
   // Fungsi sakti buat nerima dan nge-upload file
- async uploadFile(file: Express.Multer.File, folderName: string): Promise<string> {
+  async uploadFile(file: Express.Multer.File, folderName: string): Promise<string> {
     try {
       // 2. PROSES KOMPRESI: Ubah gambar ke WebP & set kualitas ke 80%
       // Kualitas 80% itu golden ratio: Gambar tetep tajam, tapi size turun drastis!
@@ -54,6 +54,36 @@ export class MinioService {
     } catch (error) {
       console.error('MinIO Upload Error:', error);
       throw new InternalServerErrorException('Gagal memproses dan upload gambar bro!');
+    }
+  }
+
+  // Fungsi khusus buat dokumen (PDF, Word, Excel) TANPA kompresi sharp
+  async uploadDocument(file: Express.Multer.File, folderName: string): Promise<string> {
+    try {
+      // 1. Ambil ekstensi asli filenya (misal: pdf, docx)
+      const extension = file.originalname.split('.').pop();
+      const uniqueFileName = `${folderName}/${crypto.randomUUID()}-${Date.now()}.${extension}`;
+      
+      // 2. Langsung kirim buffer mentah (tanpa sharp)
+      await this.minioClient.putObject(
+        this.bucketName,
+        uniqueFileName,
+        file.buffer, 
+        file.size,   
+        { 'Content-Type': file.mimetype } 
+      );
+
+      // 3. Rangkai URL Public
+      const protocol = process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http';
+      const portString = (process.env.MINIO_PORT === '443' || process.env.MINIO_PORT === '80') 
+        ? '' 
+        : `:${process.env.MINIO_PORT}`;
+        
+      return `${protocol}://${process.env.MINIO_ENDPOINT}${portString}/${this.bucketName}/${uniqueFileName}`;
+      
+    } catch (error) {
+      console.error('MinIO Document Upload Error:', error);
+      throw new InternalServerErrorException('Gagal upload dokumen bro!');
     }
   }
 }
