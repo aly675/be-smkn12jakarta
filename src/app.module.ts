@@ -6,9 +6,10 @@ import { UsersModule } from './users/users.module';
 import { MinioModule } from './minio/minio.module';
 import { NewsModule } from './news/news.module';
 import { AnnouncementModule } from './announcement/announcement.module';
+import { ExtracurricularModule } from './extracurricular/extracurricular.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule],
   controllers: [AppController],
   providers: [AppService],
 })

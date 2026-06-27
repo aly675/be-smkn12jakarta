@@ -106,10 +106,14 @@ model Pegawai {
 model Ekskul {
   id          String   @id @default(uuid()) @db.Uuid
   name        String
-  description String?
-  image       String?
-  schedule    String?
-  coach       String?
+  description String   @db.Text   
+  image       String?             
+  schedule    String              
+  coach       String              
+  
+  createdById String   @map("created_by_id") @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -228,7 +232,9 @@ model User {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  berita   Berita[]
+  berita     Berita[]
   pengumuman Pengumuman[]
+  ekskul     Ekskul[]
+
   @@map("users")
 }

@@ -53,7 +53,6 @@ export class NewsService {
         take: limit,
         orderBy: { createdAt: 'desc' }, 
         include: {
-          // Relasi: Ambil data penulis, TAPI JANGAN BAWA PASSWORD-NYA!
           author: {
             select: { 
               id: true, 
