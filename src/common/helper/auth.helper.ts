@@ -20,4 +20,10 @@ export class AuthHelper {
       );
     }
   }
+
+  static checkIsAdmin(userRole: string, resourceName: string = 'data ini') {
+    if (userRole !== 'ADMIN') {
+      throw new ForbiddenException(`Woi bro! Akses ditolak. Cuma Admin yang boleh ngotak-ngatik ${resourceName}!`);
+    }
+  }
 }

@@ -7,9 +7,10 @@ import { MinioModule } from './minio/minio.module';
 import { NewsModule } from './news/news.module';
 import { AnnouncementModule } from './announcement/announcement.module';
 import { ExtracurricularModule } from './extracurricular/extracurricular.module';
+import { TeacherModule } from './teacher/teacher.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule],
   controllers: [AppController],
   providers: [AppService],
 })
