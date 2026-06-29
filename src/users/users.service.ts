@@ -218,7 +218,7 @@ async create(dto: CreateUserDto) {
     AuthHelper.checkOwnershipOrAdmin(id, loggedInUserId, userRole, 'avatar');
 
     // 2. Suruh MinioService nge-upload dan kita tangkep URL-nya
-    const avatarUrl = await this.minioService.uploadFile(file, 'avatars');
+    const avatarUrl = await this.minioService.uploadImage(file, 'avatars');
 
     // 3. Simpan URL tersebut ke database Postgres kita
     await this.prisma.user.update({

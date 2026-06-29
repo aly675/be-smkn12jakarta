@@ -41,7 +41,7 @@ export class NewsController {
       }),
     ) file: Express.Multer.File,
   ) {
-    const imageUrl = await this.minioService.uploadFile(file, 'news');
+    const imageUrl = await this.minioService.uploadImage(file, 'news');
     
     return {
       message: 'Gambar berhasil di-upload!',

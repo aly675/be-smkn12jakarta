@@ -109,7 +109,7 @@ export class UsersController {
           // Satpam Ukuran: Maksimal 500 KB (500 * 1024 bytes)
           new MaxFileSizeValidator({ maxSize: 500 * 1024, message: 'File kebesaran bro! Maksimal 500KB aja.' }),
           // Satpam Format: Cuma nerima jpeg, jpg, png
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp)' }),
         ],
         fileIsRequired: true, 
       }),

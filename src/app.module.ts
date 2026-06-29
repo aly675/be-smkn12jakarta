@@ -8,9 +8,10 @@ import { NewsModule } from './news/news.module';
 import { AnnouncementModule } from './announcement/announcement.module';
 import { ExtracurricularModule } from './extracurricular/extracurricular.module';
 import { TeacherModule } from './teacher/teacher.module';
+import { EmployeeModule } from './employee/employee.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule],
   controllers: [AppController],
   providers: [AppService],
 })

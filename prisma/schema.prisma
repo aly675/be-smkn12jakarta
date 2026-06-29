@@ -79,7 +79,7 @@ model Pengumuman {
 model Guru {
   id          String   @id @default(uuid()) @db.Uuid
   name        String
-  nip         String
+  nip         String   @unique
   position    String?
   subject     String   
   photo       String?
@@ -96,14 +96,19 @@ model Guru {
 }
 
 model Pegawai {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  nip       String?
-  position  String?
-  division  String?
-  photo     String?
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  nip         String   @unique
+  position    String   
+  division    String?
+  photo       String?
+  contact     String? 
+
+  createdById String   @map("created_by_id") @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("pegawai")
 }
@@ -241,6 +246,7 @@ model User {
   pengumuman Pengumuman[]
   ekskul     Ekskul[]
   guru       Guru[]
+  pegawai    Pegawai[]
 
   @@map("users")
 }

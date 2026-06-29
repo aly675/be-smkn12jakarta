@@ -21,7 +21,7 @@ export class MinioService {
   }
 
   // Fungsi sakti buat nerima dan nge-upload file
-  async uploadFile(file: Express.Multer.File, folderName: string): Promise<string> {
+  async uploadImage(file: Express.Multer.File, folderName: string): Promise<string> {
     try {
       // 2. PROSES KOMPRESI: Ubah gambar ke WebP & set kualitas ke 80%
       // Kualitas 80% itu golden ratio: Gambar tetep tajam, tapi size turun drastis!

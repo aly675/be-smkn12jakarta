@@ -41,7 +41,7 @@ export class ExtracurricularController {
     ) file: Express.Multer.File,
   ) {
     // Kita panggil fungsi uploadImage yang udah ada sharp (kompresi) di dalamnya
-    const imageUrl = await this.minioService.uploadFile(file, 'extracurricular');
+    const imageUrl = await this.minioService.uploadImage(file, 'extracurricular');
     
     return {
       message: 'Gambar ekskul berhasil di-upload bro!',

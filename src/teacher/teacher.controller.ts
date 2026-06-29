@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { MinioService } from 'src/minio/minio.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthHelper } from '../common/helper/auth.helper';
 
@@ -46,7 +46,7 @@ export class TeacherController {
     // Validasi: Cuma Admin yang boleh upload foto guru
     AuthHelper.checkIsAdmin(req.user.role, 'upload foto guru');
 
-    const imageUrl = await this.minioService.uploadFile(file, 'teacher');
+    const imageUrl = await this.minioService.uploadImage(file, 'teacher');
     
     return {
       message: 'Foto guru berhasil di-upload bro!',
@@ -68,23 +68,57 @@ export class TeacherController {
     return this.teacherService.create(createTeacherDto, createdById, userRole);
   }
 
+  // ==========================================
+  // JALUR 3: AMBIL SEMUA DATA GURU (PAGINATION + SEARCH)
+  // ==========================================
   @Get()
-  findAll() {
-    return this.teacherService.findAll();
+  @ApiOperation({ summary: 'Ambil semua data guru (Public + Pagination + Search)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Cari berdasarkan nama, nip, mapel, posisi, atau pendidikan' })
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    const pageNumber = page ? +page : 1;
+    const limitNumber = limit ? +limit : 10;
+    
+    return this.teacherService.findAll(pageNumber, limitNumber, search);
   }
 
+  // ==========================================
+  // JALUR 4: AMBIL DETAIL DATA GURU BERDASARKAN ID
+  // ==========================================
   @Get(':id')
+  @ApiOperation({ summary: 'Ambil detail guru berdasarkan ID (Public)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Guru (UUID)' })
   findOne(@Param('id') id: string) {
-    return this.teacherService.findOne(+id);
+    return this.teacherService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
-    return this.teacherService.update(+id, updateTeacherDto);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update data guru (Khusus Admin)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Guru (UUID)' })
+  update(
+    @Param('id') id: string, 
+    @Body() updateTeacherDto: UpdateTeacherDto, 
+    @Req() req: any
+  ) {
+    const userRole = req.user.role; 
+    return this.teacherService.update(id, updateTeacherDto, userRole);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.teacherService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Hapus data guru (Khusus Admin)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID Guru (UUID)' })
+  remove(@Param('id') id: string, @Req() req: any) {
+    const userRole = req.user.role; 
+    
+    return this.teacherService.remove(id, userRole);
   }
 }
