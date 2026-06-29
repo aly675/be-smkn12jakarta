@@ -8,7 +8,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthHelper } from '../common/helper/auth.helper';
 
-@ApiTags('Guru')
+@ApiTags('teacher')
 @Controller('teacher')
 export class TeacherController {
   constructor(
