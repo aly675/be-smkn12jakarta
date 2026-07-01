@@ -170,13 +170,18 @@ model Jurusan {
   id                  String   @id @default(uuid()) @db.Uuid
   name                String
   slug                String   @unique
-  description         String?
+  description         String   
   image               String?
   icon                String?
+  
   suitableFor         String[] @map("suitable_for")
   careerOpportunities String[] @map("career_opportunities")
   subjects            String[]
   practiceImages      String[] @map("practice_images")
+
+  createdById         String   @map("created_by_id") @db.Uuid
+  createdBy           User     @relation(fields: [createdById], references: [id])
+
   createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -262,6 +267,7 @@ model User {
   prestasi   Prestasi[]
   layanan    Layanan[]
   kepalaSekolah KepalaSekolah[]
+  jurusan       Jurusan[]
 
   @@map("users")
 }

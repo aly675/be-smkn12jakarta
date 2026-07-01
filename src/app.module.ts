@@ -12,9 +12,10 @@ import { EmployeeModule } from './employee/employee.module';
 import { AchievementModule } from './achievement/achievement.module';
 import { PortalModule } from './portal/portal.module';
 import { PrincipalModule } from './principal/principal.module';
+import { MajorModule } from './major/major.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule, AchievementModule, PortalModule, PrincipalModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule, AchievementModule, PortalModule, PrincipalModule, MajorModule],
   controllers: [AppController],
   providers: [AppService],
 })
