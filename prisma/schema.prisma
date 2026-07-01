@@ -152,10 +152,14 @@ model Prestasi {
 model Layanan {
   id          String   @id @default(uuid()) @db.Uuid
   name        String
-  description String?
-  url         String?
-  icon        String?
-  category    String?  @default("siswa")
+  description String   
+  url         String   
+  icon        String?  
+  category    String   
+
+  createdById String   @map("created_by_id") @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -252,6 +256,7 @@ model User {
   guru       Guru[]
   pegawai    Pegawai[]
   prestasi   Prestasi[]
+  layanan    Layanan[]
 
   @@map("users")
 }
