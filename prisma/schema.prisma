@@ -131,16 +131,20 @@ model Ekskul {
 }
 
 model Prestasi {
-  id           String    @id @default(uuid()) @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
   title        String
   description  String?
-  date         DateTime? @default(now()) @db.Timestamptz()
-  level        String?
-  category     String?
+  date         DateTime @db.Timestamptz() 
+  level        String   
+  category     String   
   image        String?
   participants String?
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  createdById  String   @map("created_by_id") @db.Uuid
+  createdBy    User     @relation(fields: [createdById], references: [id])
+
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("prestasi")
 }
@@ -247,6 +251,7 @@ model User {
   ekskul     Ekskul[]
   guru       Guru[]
   pegawai    Pegawai[]
+  prestasi   Prestasi[]
 
   @@map("users")
 }

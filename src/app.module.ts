@@ -9,9 +9,10 @@ import { AnnouncementModule } from './announcement/announcement.module';
 import { ExtracurricularModule } from './extracurricular/extracurricular.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { EmployeeModule } from './employee/employee.module';
+import { AchievementModule } from './achievement/achievement.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule, AchievementModule],
   controllers: [AppController],
   providers: [AppService],
 })
