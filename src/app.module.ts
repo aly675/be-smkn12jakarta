@@ -14,9 +14,10 @@ import { PortalModule } from './portal/portal.module';
 import { PrincipalModule } from './principal/principal.module';
 import { MajorModule } from './major/major.module';
 import { PartnerModule } from './partner/partner.module';
+import { SocialMediaModule } from './social-media/social-media.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule, AchievementModule, PortalModule, PrincipalModule, MajorModule, PartnerModule],
+  imports: [AuthModule, UsersModule, MinioModule, NewsModule, AnnouncementModule, ExtracurricularModule, TeacherModule, EmployeeModule, AchievementModule, PortalModule, PrincipalModule, MajorModule, PartnerModule, SocialMediaModule],
   controllers: [AppController],
   providers: [AppService],
 })
