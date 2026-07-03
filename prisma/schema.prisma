@@ -204,14 +204,17 @@ model KepalaSekolah {
 
   @@map("kepala_sekolah")
 }
-
 model MitraIndustri {
   id              String   @id @default(uuid()) @db.Uuid
   name            String
   description     String?
   logo            String?
-  cooperationType String?  @map("cooperation_type")
+  cooperationType String[] @map("cooperation_type") 
   website         String?
+
+  createdById     String   @map("created_by_id") @db.Uuid
+  createdBy       User     @relation(fields: [createdById], references: [id])
+
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -268,6 +271,7 @@ model User {
   layanan    Layanan[]
   kepalaSekolah KepalaSekolah[]
   jurusan       Jurusan[]
-
+  mitraIndustri MitraIndustri[]
+  
   @@map("users")
 }
