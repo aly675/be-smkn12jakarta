@@ -17,37 +17,7 @@ async function main() {
     console.log('🌱 Mulai proses seeding....');
 
     // ==========================================
-    // 1. SEEDING SITE SETTINGS
-    // ==========================================
-    const defaultSettings = [
-      { key: 'site_name', value: 'SMKN 12 Jakarta' },
-      { key: 'site_tagline', value: 'Sekolah Menengah Kejuruan Negeri 12 Jakarta' },
-      {
-        key: 'visi',
-        value:
-          'Menjadi sekolah kejuruan unggulan yang menghasilkan lulusan berkompeten, berkarakter, dan berdaya saing global.',
-      },
-      {
-        key: 'misi',
-        value:
-          'Menyelenggarakan pendidikan berkualitas berbasis teknologi;Mengembangkan kompetensi siswa sesuai kebutuhan industri;Membangun karakter siswa yang berakhlak mulia;Menjalin kerjasama dengan dunia usaha dan industri;Menciptakan lingkungan belajar yang kondusif dan inovatif',
-      },
-      { key: 'alamat', value: 'Jl. Kebon Bawang XV, Tanjung Priok, Jakarta Utara' },
-      { key: 'telepon', value: '(021) 4302938' },
-      { key: 'email', value: 'smkn12jkt@jakarta.go.id' },
-    ];
-
-    for (const setting of defaultSettings) {
-      const result = await prisma.siteSettings.upsert({
-        where: { key: setting.key },
-        update: { value: setting.value },
-        create: setting,
-      });
-      console.log(`✓ Seeding Pengaturan: ${result.key}`);
-    }
-
-    // ==========================================
-    // 2. SEEDING SUPER ADMIN
+    // 1. SEEDING SUPER ADMIN
     // ==========================================
     console.log('⏳ Menyiapkan akun Super Admin...');
     
@@ -73,6 +43,50 @@ async function main() {
   } finally {
     await prisma.$disconnect();
   }
+
+    // ==========================================
+    // 2. SEEDING SITE SETTINGS
+    // ==========================================
+    const admin = await prisma.user.findFirst({
+      where: { role: 'ADMIN' } 
+      });
+
+      if (!admin) {
+        console.log('Bikin akun Admin dulu bro sebelum seeding setting!');
+        return;
+      }
+
+    const defaultSettings = [
+      { key: 'site_name', value: 'SMKN 12 Jakarta' },
+      { key: 'site_tagline', value: 'Sekolah Menengah Kejuruan Negeri 12 Jakarta' },
+      {
+        key: 'visi',
+        value:
+          'Menjadi sekolah kejuruan unggulan yang menghasilkan lulusan berkompeten, berkarakter, dan berdaya saing global.',
+      },
+      {
+        key: 'misi',
+        value:
+          'Menyelenggarakan pendidikan berkualitas berbasis teknologi;Mengembangkan kompetensi siswa sesuai kebutuhan industri;Membangun karakter siswa yang berakhlak mulia;Menjalin kerjasama dengan dunia usaha dan industri;Menciptakan lingkungan belajar yang kondusif dan inovatif',
+      },
+      { key: 'alamat', value: 'Jl. Kebon Bawang XV, Tanjung Priok, Jakarta Utara' },
+      { key: 'telepon', value: '(021) 4302938' },
+      { key: 'email', value: 'smkn12jkt@jakarta.go.id' },
+    ];
+
+    for (const setting of defaultSettings) {
+      const result = await prisma.siteSettings.upsert({
+        where: { key: setting.key },
+        update: { value: setting.value },
+        create: {
+          ...setting,
+          createdById: admin.id, 
+        },
+      });
+      console.log(`✓ Seeding Pengaturan: ${result.key}`);
+    }
+
+   
 }
 
 main();

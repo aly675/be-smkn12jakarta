@@ -21,7 +21,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
-    "db:seed": "node --loader ts-node/esm prisma/seed.ts",
+    "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset --skip-generate --force"
   },
   "dependencies": {
@@ -72,6 +72,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.22.5",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },
@@ -93,6 +94,6 @@
     "testEnvironment": "node"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   }
 }

@@ -239,7 +239,11 @@ model SocialMedia {
 model SiteSettings {
   id        String   @id @default(uuid()) @db.Uuid
   key       String   @unique
-  value     String?
+  value     String
+
+  createdById String   @map("created_by_id") @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -249,7 +253,7 @@ model SiteSettings {
 enum Role {
   ADMIN
   GURU
-  Osis
+  OSIS
   SISWA
   ORANGTUA
   PEGAWAI
@@ -277,6 +281,7 @@ model User {
   jurusan       Jurusan[]
   mitraIndustri MitraIndustri[]
   socialMedia   SocialMedia[]
+  siteSettings  SiteSettings[]
   
   @@map("users")
 }
