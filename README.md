@@ -1,5 +1,3 @@
-
-```markdown
 # 🚀 Backend Portal SMKN 12 Jakarta
 
 API Backend untuk sistem portal informasi dan manajemen konten SMKN 12 Jakarta. Dibangun menggunakan arsitektur modern dengan **NestJS**, **Prisma ORM (v7)**, dan **PostgreSQL**.
@@ -38,7 +36,7 @@ yarn install
 
 Buat file `.env` di *root directory* project dengan menyalin dari `.env.example` (jika ada), atau buat manual dengan format berikut:
 
-```env
+env
 # Konfigurasi Database
 # PENTING: Jika password DB menggunakan karakter khusus (seperti =, +, $, dll), pastikan menggunakan format URL Encoded!
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@localhost:5432/[NAMA_DATABASE]?schema=portal"
@@ -123,7 +121,3 @@ Pastikan kamu sudah mengatur `DB_SCHEMA="portal"` di file `.env`. Prisma 7 membu
 * **Error "Invalid connection string" / Karakter Khusus di Password:**
 Jika password PostgreSQL kamu mengandung simbol `=` atau `+`, wajib di-encode.
 Contoh: `=` menjadi `%3D`, dan `+` menjadi `%2B`.
-
-```
-
-```
