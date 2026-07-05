@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portal-backend
+  namespace: portal
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    # ⚠️ Jangan lupa sesuaikan nama domainnya sama yang didaftarin di DNS sekolah!
+    - host: api-portal.smkn12jakarta.sch.id 
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portal-backend
+                port:
+                  number: 80 

@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-build:
+    runs-on: k3s-runner
+    steps:
+      - name: Checkout
+        env:
+          GIT_TOKEN: ${{ gitea.token }}
+        run: |
+          git clone http://x-access-token:$GIT_TOKEN@10.10.0.150:3000/${{ gitea.repository }}.git .
+          git checkout ${{ gitea.sha }}
+
+      - name: Node.js Syntax & Build Check
+        run: |
+          # Pake Node.js v24 Alpine, nyalain corepack buat yarn, lalu install & build
+          docker run --rm -v "$PWD":/app -w /app node:24-alpine \
+            sh -c 'corepack enable && yarn install --frozen-lockfile && yarn run build'

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portal-backend
+  namespace: portal
+  labels:
+    app: portal-backend
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: portal-backend
+  template:
+    metadata:
+      labels:
+        app: portal-backend
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      
+      # 🚀 Init Container: Cuma buat jalanin Prisma Migrate sebelum API nyala
+      initContainers:
+        - name: prisma-migrate
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          command:
+            - sh
+            - -c
+            - "npx prisma migrate deploy"
+          envFrom:
+            - secretRef:
+                name: portal-secrets
+
+      # 🚀 Container Utama: NestJS App
+      containers:
+        - name: portal-api
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: portal-secrets
+          env:
+            - name: TZ
+              value: Asia/Jakarta
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              # Node.js/NestJS biasanya lebih hemat memory dibanding pool PHP-FPM
+              memory: "512Mi" 
+              cpu: "500m"
+          
+          # Cek kesehatan container nembak langsung ke port 3000
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

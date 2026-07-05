@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      # Kita asumsikan Dockerfile ada di root direktori sekarang
+      dockerfile: Dockerfile
+    container_name: portal-backend-${NODE_ENV:-development}
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - portal_net
+
+networks:
+  portal_net:
+    driver: bridge
