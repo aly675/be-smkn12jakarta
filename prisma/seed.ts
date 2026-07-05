@@ -7,7 +7,10 @@ import * as bcrypt from 'bcrypt';
 // Setup driver adapter PostgreSQL aslinya bro
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
+
+const adapter = new PrismaPg(pool, {
+  schema: process.env.DB_SCHEMA || 'public',
+});
 
 // Prisma v7 WAJIB disuapin adapter ini, udah nggak nerima URL langsung
 const prisma = new PrismaClient({ adapter });

@@ -10,7 +10,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     // Sama kayak di seed, API juga butuh disuapin adapter
     const connectionString = `${process.env.DATABASE_URL}`;
     const pool = new Pool({ connectionString });
-    const adapter = new PrismaPg(pool);
+    
+    const adapter = new PrismaPg(pool, {
+      schema: process.env.DB_SCHEMA || 'public',
+    });
+
+    const prisma = new PrismaClient({ adapter });
     
     super({ adapter });
   }

@@ -1,98 +1,129 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+```markdown
+# 🚀 Backend Portal SMKN 12 Jakarta
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API Backend untuk sistem portal informasi dan manajemen konten SMKN 12 Jakarta. Dibangun menggunakan arsitektur modern dengan **NestJS**, **Prisma ORM (v7)**, dan **PostgreSQL**.
 
-## Description
+## 🛠️ Tech Stack
+- **Framework:** [NestJS](https://nestjs.com/)
+- **ORM:** [Prisma](https://www.prisma.io/) (dengan `@prisma/adapter-pg`)
+- **Database:** PostgreSQL
+- **Language:** TypeScript
+- **Authentication:** JWT (JSON Web Token) & Passport
+- **Package Manager:** Yarn
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 📋 Persyaratan Sistem (Prerequisites)
+Pastikan sistem kamu sudah terinstall:
+- **Node.js** (Rekomendasi versi 20.x atau 24.x terbaru)
+- **Yarn** (`npm install --global yarn`)
+- **PostgreSQL** (Bisa menggunakan lokal atau server)
 
+---
+
+## ⚙️ Cara Instalasi & Setup Lokal
+
+Ikuti langkah-langkah di bawah ini untuk menjalankan project di komputer lokal kamu.
+
+### 1. Clone Repository & Install Dependencies
 ```bash
-$ yarn install
+git clone <url-repo-lu-di-sini>
+cd portal-backend
+yarn install
+
 ```
 
-## Compile and run the project
+### 2. Konfigurasi Environment Variables
 
-```bash
-# development
-$ yarn run start
+Buat file `.env` di *root directory* project dengan menyalin dari `.env.example` (jika ada), atau buat manual dengan format berikut:
 
-# watch mode
-$ yarn run start:dev
+```env
+# Konfigurasi Database
+# PENTING: Jika password DB menggunakan karakter khusus (seperti =, +, $, dll), pastikan menggunakan format URL Encoded!
+DATABASE_URL="postgresql://[USER]:[PASSWORD]@localhost:5432/[NAMA_DATABASE]?schema=portal"
 
-# production mode
-$ yarn run start:prod
+# Nama Schema Database (default: portal)
+DB_SCHEMA="portal"
+
+# Secret Key untuk Authentication (Ganti dengan string acak yang aman)
+JWT_SECRET="rahasia_super_aman_smkn12"
+
 ```
 
-## Run tests
+### 3. Setup Database & Migrasi
+
+Karena project ini menggunakan skema khusus (`portal`) dan adapter `pg`, jalankan perintah berikut secara berurutan untuk menyiapkan database:
 
 ```bash
-# unit tests
-$ yarn run test
+# 1. Terapkan struktur tabel ke database (Migrate)
+npx prisma migrate dev --name init_lokal
 
-# e2e tests
-$ yarn run test:e2e
+# 2. Sinkronisasi Prisma Client dengan schema terbaru (Generate)
+npx prisma generate
 
-# test coverage
-$ yarn run test:cov
 ```
 
-## Deployment
+### 4. Seeding Data (Wajib!)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Jalankan seeder untuk mengisi data awal (*Site Settings*, Kategori, dll) dan membuat **Akun Super Admin**.
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+yarn db:seed
+
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 🔑 Akun Admin Default (Lokal)
 
-Check out a few resources that may come in handy when working with NestJS:
+Setelah berhasil menjalankan seeder (`yarn db:seed`), kamu bisa login menggunakan kredensial default berikut untuk mengakses fitur Admin:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+* **Username:** `admin`
+* **Password:** `rahasia123`
+* **Role:** `ADMIN`
 
-## Support
+*(Catatan: Segera ganti password ini jika aplikasi di-deploy ke Production!)*
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 🚀 Cara Menjalankan Aplikasi
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Mode Development (Auto-reload)
+yarn start:dev
 
-## License
+# Mode Production
+yarn build
+yarn start:prod
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
+
+Secara default, API akan berjalan di `http://localhost:3000`.
+
+---
+
+## 🗄️ Manajemen Database (Prisma Studio)
+
+Untuk melihat, mengedit, atau menghapus isi database secara visual lewat browser, jalankan perintah ini:
+
+```bash
+npx prisma studio
+
+```
+
+Akses di browser melalui: `http://localhost:5555`
+
+---
+
+## 💡 Troubleshooting (Catatan Penting)
+
+* **Error "Table public.users does not exist" saat Seeding:**
+Pastikan kamu sudah mengatur `DB_SCHEMA="portal"` di file `.env`. Prisma 7 membutuhkan definisi schema eksplisit yang diatur via adapter di dalam file `src/prisma/prisma.service.ts` dan `prisma/seed.ts`.
+* **Error "Invalid connection string" / Karakter Khusus di Password:**
+Jika password PostgreSQL kamu mengandung simbol `=` atau `+`, wajib di-encode.
+Contoh: `=` menjadi `%3D`, dan `+` menjadi `%2B`.
+
+```
+
+```
