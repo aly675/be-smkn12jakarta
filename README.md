@@ -36,7 +36,7 @@ yarn install
 
 Buat file `.env` di *root directory* project dengan menyalin dari `.env.example` (jika ada), atau buat manual dengan format berikut:
 
-env
+```env
 # Konfigurasi Database
 # PENTING: Jika password DB menggunakan karakter khusus (seperti =, +, $, dll), pastikan menggunakan format URL Encoded!
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@localhost:5432/[NAMA_DATABASE]?schema=portal"
